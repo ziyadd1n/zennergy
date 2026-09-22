@@ -21,7 +21,7 @@ function filterArticles() {
     if (matches) count++;
   });
   document.querySelector('#no-results').hidden = count !== 0;
-  document.querySelector('#results-status').textContent = count + ' selected resource' + (count === 1 ? '' : 's') + ' · External sources, with original Zennergy summaries.';
+  document.querySelector('#results-status').textContent = count + ' selected ' + (count === 1 ? 'story or resource' : 'stories and resources') + ' · External sources, with original ZEN energy summaries.';
 }
 function setFilter(topic) {
   activeFilter = topic;
@@ -40,3 +40,6 @@ const privacyDialog = document.querySelector('#privacy-dialog');
 document.querySelector('#privacy-open').addEventListener('click', () => privacyDialog.showModal());
 document.querySelector('#privacy-close').addEventListener('click', () => privacyDialog.close());
 privacyDialog.addEventListener('click', event => { if (event.target === privacyDialog) { const rect = privacyDialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) privacyDialog.close(); } });
+
+filterArticles();
+
