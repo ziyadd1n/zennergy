@@ -8,6 +8,7 @@ menuToggle.addEventListener('click', () => {
 });
 navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && navigation.classList.contains('open')) { closeMenu(); menuToggle.focus(); } });
+if (document.querySelector('#search')) {
 const filterButtons = [...document.querySelectorAll('[data-filter]')];
 const articles = [...document.querySelectorAll('.article')];
 const search = document.querySelector('#search');
@@ -34,12 +35,13 @@ function setFilter(topic) {
 }
 filterButtons.forEach(button => button.addEventListener('click', () => setFilter(button.dataset.filter)));
 search.addEventListener('input', filterArticles);
-document.querySelectorAll('[data-topic]').forEach(link => link.addEventListener('click', () => { search.value = ''; setFilter(link.dataset.topic); }));
+const requestedTopic = new URLSearchParams(window.location.search).get('topic');
+setFilter(['oil','clean','policy'].includes(requestedTopic) ? requestedTopic : 'all');
+}
 document.querySelector('#year').textContent = new Date().getFullYear();
 const privacyDialog = document.querySelector('#privacy-dialog');
 document.querySelector('#privacy-open').addEventListener('click', () => privacyDialog.showModal());
 document.querySelector('#privacy-close').addEventListener('click', () => privacyDialog.close());
 privacyDialog.addEventListener('click', event => { if (event.target === privacyDialog) { const rect = privacyDialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) privacyDialog.close(); } });
 
-filterArticles();
 
