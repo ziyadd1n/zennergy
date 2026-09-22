@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $files = @('index.html','news.html','focus.html','about.html','careers.html','contact.html','styles.css','script.js')
 $assets = @{}
@@ -32,7 +32,7 @@ $portraitPath = Join-Path $root 'assets/ziyaddin-omarov.png'
 if (!(Test-Path -LiteralPath $portraitPath)) { throw 'Missing founder portrait' }
 $portraitBytes = [IO.File]::ReadAllBytes($portraitPath)
 if ($portraitBytes.Length -lt 8 -or [BitConverter]::ToString($portraitBytes[0..7]) -ne '89-50-4E-47-0D-0A-1A-0A') { throw 'Invalid PNG portrait' }
-if (!$html.Contains('src="/assets/ziyaddin-omarov.png"')) { throw 'Founder portrait is not referenced by the page' }
+if (!$html.Contains('src="/assets/ziyaddin-omarov.png?v=2"')) { throw 'Founder portrait is not referenced by the page' }
 $portraitJson = ConvertTo-Json -InputObject ([Convert]::ToBase64String($portraitBytes)) -Compress
 $worker = 'const assets = ' + $assetJson + '; const portrait = ' + $portraitJson + ';' + @'
 
@@ -54,3 +54,4 @@ export default {
 New-Item -ItemType Directory -Force (Join-Path $root 'dist/server') | Out-Null
 [IO.File]::WriteAllText((Join-Path $root 'dist/server/index.js'), $worker, [Text.UTF8Encoding]::new($false))
 Write-Output 'Build passed: required files, unique IDs, anchor targets and founder details checked. Worker output created.'
+
