@@ -33,11 +33,19 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Validate site
+        shell: pwsh
+        run: ./build.ps1
+      - name: Prepare public files
+        run: |
+          mkdir -p _site
+          cp index.html news.html focus.html about.html careers.html contact.html styles.css script.js _site/
+          cp -R assets _site/assets
+          touch _site/.nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

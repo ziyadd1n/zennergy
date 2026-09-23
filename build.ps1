@@ -18,9 +18,12 @@ foreach ($match in [regex]::Matches($pageHtml, 'href="#([^"]+)"')) {
   if ($match.Groups[1].Value -notin $ids) { throw "Missing anchor target: $($match.Groups[1].Value)" }
 }
 if ([regex]::Matches($pageHtml,'<h1>').Count -ne 1) { throw "Expected one page heading: $file" }
-foreach ($match in [regex]::Matches($pageHtml,'href="(/[^"?]*)')) {
+foreach ($match in [regex]::Matches($pageHtml,'(?:href|src)="([^"?#]+)')) {
   $link = $match.Groups[1].Value
-  if ($link -ne '/' -and !$assets.ContainsKey($link) -and !$assets.ContainsKey($link + '.html')) { throw "Broken page link: $link" }
+  if ($link -match '^(?:[a-z]+:|//)') { continue }
+  if ($link.StartsWith('/')) { throw "Root-relative URL breaks GitHub Pages: $link" }
+  $target = Join-Path $root $link
+  if (!(Test-Path -LiteralPath $target)) { throw "Broken local link: $link" }
 }
 }
 if ($assets['/index.html'] -match 'id="(insights|focus|about|careers|contact)"') { throw 'Homepage contains secondary section content' }
@@ -32,7 +35,7 @@ $portraitPath = Join-Path $root 'assets/ziyaddin-omarov.png'
 if (!(Test-Path -LiteralPath $portraitPath)) { throw 'Missing founder portrait' }
 $portraitBytes = [IO.File]::ReadAllBytes($portraitPath)
 if ($portraitBytes.Length -lt 8 -or [BitConverter]::ToString($portraitBytes[0..7]) -ne '89-50-4E-47-0D-0A-1A-0A') { throw 'Invalid PNG portrait' }
-if (!$html.Contains('src="/assets/ziyaddin-omarov.png?v=2"')) { throw 'Founder portrait is not referenced by the page' }
+if (!$html.Contains('src="./assets/ziyaddin-omarov.png?v=2"')) { throw 'Founder portrait is not referenced by the page' }
 $portraitJson = ConvertTo-Json -InputObject ([Convert]::ToBase64String($portraitBytes)) -Compress
 $worker = 'const assets = ' + $assetJson + '; const portrait = ' + $portraitJson + ';' + @'
 
